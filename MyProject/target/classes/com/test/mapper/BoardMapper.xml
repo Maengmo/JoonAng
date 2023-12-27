@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.mapper.BoardMapper">
+
+	<select id="getTalkList" resultType="com.test.domain.TalkDTO">
+		select * from tblTalk t
+		inner join tblCustomer c
+		on t.cus_id = c.cus_id
+		inner join tblDepartment d
+		on c.dep_num = d.dep_num
+		order by t.talk_num desc
+	</select>
+	
+	<select id="getLocation" resultType="com.test.domain.WorkDTO">
+		select * from tblWork w
+		inner join tblStation s
+		on w.sta_num = s.sta_num
+	</select>
+	
+	<select id="getComunication" resultType="com.test.domain.TogetherDTO">
+		select * from tblTogether t
+		inner join tblWork w
+		on t.sta_num = w.sta_num
+		order by to_num desc
+	</select>
+	
+	<select id="getPwd" resultType="String">
+		select cus_pw from tblCustomer
+		where cus_id = #{cus_id}
+	</select>
+	
+	<insert id="signup" parameterType="com.test.domain.CustomerDTO">
+		insert into tblCustomer
+		values(#{cus_id}, #{dep_num}, #{cus_name}, #{cus_birth}, #{cus_email}, #{cus_pw})
+	</insert>
+	
+	<select id="getAnswer" resultType="com.test.domain.AnswerDTO">
+		select * from tblAnswer
+	</select>
+	
+	<select id="getTalkDetailsByTalkNum" resultType="com.test.domain.AnswerDTO">
+		select * from tblAnswer
+		where talk_num = #{talknum}
+	</select>
+	
+	<insert id="addAnswer" parameterType="com.test.domain.AnswerDTO">
+		insert into tblAnswer
+		values(ans_num.nextVal, #{talk_num}, #{cus_id}, #{ans_content})
+	</insert>
+	
+	<insert id="addtalk" parameterType="com.test.domain.TalkDTO">
+		insert into tblTalk
+		values(talk_num.nextVal, #{cus_id}, #{talk_subject}, #{talk_content})
+	</insert>
+	
+	<select id="getTalkList2" resultType="com.test.domain.TalkDTO">
+		select * from tblTalk t
+		inner join tblCustomer c
+		on t.cus_id = c.cus_id
+		inner join tblDepartment d
+		on c.dep_num = d.dep_num
+		where d.dep_num = #{dep_num}
+	</select>
+	
+	<insert id="addTanswer" parameterType="com.test.domain.TogetherDTO">
+		insert into tblTogether
+		values(to_num.nextVal, #{cus_id}, #{sta_num}, #{to_content})
+	</insert>
+	
+	<select id="getWorkList" resultType="com.test.domain.WorkDTO">
+		select * from tblWork w
+		inner join tblStation s
+		on w.sta_num = s.sta_num
+		where dep_num = #{depnum}
+	</select>
+	
+	<select id="searchList" resultType="com.test.domain.TalkDTO">
+	    <![CDATA[
+	    SELECT * FROM tblTalk 
+	    WHERE talk_subject LIKE '%' || #{name} || '%' OR talk_content LIKE '%' || #{name} || '%'
+	    ]]>
+	</select>
+	
+	<select id="checkid" resultType="Integer">
+		select count(*) from tblCustomer where cus_id = #{id}
+	</select>
+	
+	<select id="getMyList" resultType="com.test.domain.CustomerDTO">
+		select * from TblCustomer c
+		inner join tblDepartment d
+		on c.dep_num = d.dep_num
+		where cus_id = #{id}
+	</select>
+
+</mapper>
+
