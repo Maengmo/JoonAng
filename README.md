@@ -3,7 +3,7 @@
 <br>    
 <img width="954" alt="로그인" src="https://github.com/Maengmo/JoonAng/assets/117720344/617709a1-4b7f-479c-af21-470327d20b6e">
 
-<br>
+<br> 
 
 ## ⁉ 프로그램 소개
   <p>중앙그룹내의 직원들간의 소통과 친목을 다질 수 있는 공간의 플랫폼을 개발하였다. </p>
