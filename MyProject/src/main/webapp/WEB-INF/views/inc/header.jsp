@@ -93,8 +93,14 @@
                 <% } else { %>
                     <%-- 세션에 userId가 없을 경우(로그아웃 상태) --%>
                     <li class="nav-item">
+                        <a class="nav-link nav-link-custom white" href="/project/adminLogin.do">관리자</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link nav-link-custom white" href="/project/login.do">로그인</a>
                     </li>
+                    <li class="nav-item">
+	                	<a class="nav-link nav-link-custom white" href="/project/find.do">ID,PW 찾기</a>
+	                </li>
                     <li class="nav-item">
                         <a class="nav-link nav-link-custom white" href="/project/signup.do">회원가입</a>
                     </li>

@@ -7,16 +7,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.test.domain.AnswerDTO;
 import com.test.domain.CustomerDTO;
+import com.test.domain.SocialDTO;
 import com.test.domain.TalkDTO;
 import com.test.domain.TogetherDTO;
 import com.test.domain.WorkDTO;
@@ -41,6 +42,7 @@ public class BoardController {
 	}
 	
 //---------------------------------------- 메인 페이지	-------------------------------------------
+	@PreAuthorize("hasRole('MEMBER')")
 	@GetMapping("/board.do")
 	public String board(Model model, Principal p) {
 		
@@ -129,6 +131,7 @@ public class BoardController {
 	}
 	
 //---------------------------------------- 와글와글 게시판 ----------------------------------------
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
 	@GetMapping("/talk.do")
 	public String talk(Model model, Principal p) {
 		
@@ -158,8 +161,26 @@ public class BoardController {
 	    return detailsList;
 	}
 	
+	//게시글 좋아요
+	@GetMapping("/talk/like")
+	@ResponseBody
+	public String TalkLike(HttpServletRequest request, Model model) {
+	    
+		String talkNum = request.getParameter("talkNum");
+		String likeNum = request.getParameter("likeNum");
+		
+		
+		int talknum2 = Integer.parseInt(talkNum);
+		int likeNum2 = Integer.parseInt(likeNum);
+		
+		int like = service.addLike(talkNum);
+		
+		return (likeNum2+1) + "";
+	}
+	
 	//댓글추가
 	@PostMapping("/talk/addAnswer")
+	@ResponseBody
 	public String addAnswer(HttpServletRequest request, Model model) {
 	    AnswerDTO answerDTO = new AnswerDTO();
 	    
@@ -176,7 +197,7 @@ public class BoardController {
 
 	    model.addAttribute("message", success);
 
-	    return success;
+	    return userId;
 	}
 		
 	//글 작성
@@ -188,6 +209,10 @@ public class BoardController {
 		dto.setCus_id(userId);
 		
 		int success = service.addtalk(dto);
+		
+		if (success == 1) {
+			service.addtalk2();
+		}
 		
 		model.addAttribute("success",success);
 		
@@ -203,15 +228,13 @@ public class BoardController {
 	    return detailsList;
 	}
 	
-	//게시글 -> 검색
-	@GetMapping("/talk/text")
-	public String searchTalk(@RequestParam String search, Model model) {
-		
-	    List<TalkDTO> searchList = service.searchList(search);
-
-	    model.addAttribute("searchList", searchList);
+	@GetMapping("/talk/text{search}")
+	@ResponseBody
+	public List<TalkDTO> searchTalk(@PathVariable String search, Model model) {
 	    
-	    return "forward:/talk.do";
+	    List<TalkDTO> searchList = service.searchList(search);
+	    
+	    return searchList;
 	}
 
 //------------------------------------- 함꼐해요 중앙 --------------------------------------------
@@ -231,6 +254,7 @@ public class BoardController {
 	
 	//Together 댓글등록
 	@PostMapping("/together/addTanswer")
+	@ResponseBody
     public String addTanswer(HttpServletRequest request, Model model) {
 		
 		TogetherDTO dto = new TogetherDTO();
@@ -254,7 +278,7 @@ public class BoardController {
 			result = "실패";
 		}
 		
-		return result;
+		return userId;
     }
 	
 	//부서별 마커 찍어주기
@@ -268,7 +292,7 @@ public class BoardController {
 	}
 
 //-------------------------------------------- 마이페이지 ----------------------------------------
-
+	//마이페이지
 	@GetMapping("/mypage.do")
 	public String mypage(HttpServletRequest request, Model model, Principal p) {
 		
@@ -280,8 +304,246 @@ public class BoardController {
 		
 		return "board/mypage";
 	}
-		
 	
+	//마이페이지 - 이메일 수정
+	@GetMapping("/mypage/editEmail")
+	@ResponseBody
+	public String editEmail(HttpServletRequest request, Model model, String cus_email) {
+		
+		String id = (String) request.getSession().getAttribute("userId");
+		
+		CustomerDTO dto = new CustomerDTO();
+		
+		dto.setCus_id(id);
+		dto.setCus_email(cus_email);
+		
+		int result = service.editEmail(dto);
+		
+		if(result == 1) {
+			return "rediect:/mypage.do";
+		}else {
+			return "board.do";
+		}
+		
+	}
+	
+	//마이페이지 - 비밀번호 수정
+	@GetMapping("/mypage/editPw")
+	@ResponseBody
+	public String editPw(HttpServletRequest request, Model model, String cus_pw) {
+		
+		String id = (String) request.getSession().getAttribute("userId");
+		
+		System.out.println(id);
+		System.out.println(cus_pw);
+		
+		CustomerDTO dto = new CustomerDTO();
+		
+		dto.setCus_id(id);
+		dto.setCus_pw(cus_pw);
+		
+		int result = service.editPw(dto);
+		
+		if(result == 1) {
+			return "rediect:/mypage.do";
+		}else {
+			return "board.do";
+		}
+		
+	}
+//-------------------------------------------- 마이페이지 상세보기(Talk) ------------------------------------
+	@GetMapping("/mypage_talk.do")
+	public String mypage_talk(HttpServletRequest request, Model model) {
+		
+	    String id = (String) request.getSession().getAttribute("userId"); 
+
+	    List<TalkDTO> list = service.getMyTalk(id);
+
+	    model.addAttribute("list", list);
+
+	    return "board/mypage_talk";
+	}
+	
+	@GetMapping("/mypage_talkEdit.do")
+	public String mypage_talkEdit(HttpServletRequest request, Model model, String talk_num) {
+		
+		String id = (String) request.getSession().getAttribute("userId");
+		
+		List<TalkDTO> list = service.getTalkList3(talk_num);
+		
+		model.addAttribute("list", list);
+		
+		return "board/mypage_talkEdit";
+		
+	}
+	
+	//글 수정
+	@PostMapping("/editTalk.do")
+    public String editTalk(HttpServletRequest request, TalkDTO dto, Model model) {
+		
+		String userId = (String) request.getSession().getAttribute("userId");
+		
+		dto.setCus_id(userId);
+		
+		int success = service.editTalk(dto);
+		
+		model.addAttribute("success",success);
+		
+		return "redirect:/mypage_talk.do";
+    }
+	
+	//글 삭제
+	@GetMapping("/delTalk.do")
+	public String delTalk(Model model, String talk_num) {
+		
+		int result = service.delTalk(talk_num);
+		
+		if (result == 1) {
+			service.delTalk_like(talk_num);
+		}
+		
+		return "redirect:/mypage_talk.do";
+	}
+//-------------------------------------------- 마이페이지 상세보기(Talk) ------------------------------------
+	@GetMapping("mypage_together.do")
+	public String mypage_together(HttpServletRequest request, Model model) {
+		
+		String userId = (String) request.getSession().getAttribute("userId");
+		
+		List<TogetherDTO> list = service.getMyTogether(userId);
+		
+		model.addAttribute("list", list);
+		
+		return "board/mypage_together";
+	}
+	
+	@PostMapping("editTogether.do")
+	@ResponseBody
+	public String editTogether(HttpServletRequest request, Model model) {
+		
+		String userId = (String) request.getSession().getAttribute("userId");
+		
+		TogetherDTO dto = new TogetherDTO();
+		
+		String content = request.getParameter("to_content");
+		
+		dto.setTo_num(request.getParameter("to_num"));
+	    dto.setTo_content(request.getParameter("to_content"));
+	    
+	    int result = service.editTogether(dto);
+		
+	    if(result==1) {
+	    	return content;
+	    }else {
+	    	return "";
+	    }
+	}
+	
+	//글 삭제
+	@GetMapping("/delTogether.do")
+	public String delTogether(Model model, String to_num) {
+		
+		int result = service.delTogether(to_num);
+		
+		return "redirect:/mypage_together.do";
+	}
+	
+	
+//-------------------------------------------- ID,PW 찾기 ----------------------------------------		
+	//ID,PW 찾기
+	@GetMapping("/find.do")
+	public String find(Model model, Principal p) {
+		
+		
+		
+		return "board/find";
+		
+	}
+	
+	//ID 찾기
+	@GetMapping("/find/id")
+	@ResponseBody
+	public String find_id(HttpServletRequest request, Model model, Principal p) {
+		
+		CustomerDTO dto = new CustomerDTO();
+		
+		String email = request.getParameter("cus_email");
+		String depart = request.getParameter("cus_depart");
+		
+		dto.setCus_email(email);
+		dto.setDep_num(depart);
+		
+		String cus_id = service.findId(dto);
+		
+		if(cus_id == null) {
+			cus_id = "Your ID Not Found!!";
+		}
+
+		return cus_id;
+	}
+	
+	//PW 찾기
+	@GetMapping("/find/pw")
+	@ResponseBody
+	public String find_pw(HttpServletRequest request, Model model, Principal p) {
+		
+		CustomerDTO dto = new CustomerDTO();
+		
+		String id = request.getParameter("cus_id");
+		String email = request.getParameter("cus_email");
+		String depart = request.getParameter("cus_depart");
+		
+		dto.setCus_id(id);
+		dto.setCus_email(email);
+		dto.setDep_num(depart);
+		
+		String cus_pw = service.findPw(dto);
+		
+		if(cus_pw == null) {
+			cus_pw = "Your PW Not Found!!";
+		}
+
+		return cus_pw;
+	}
+
+//--------------------------------- Social Login 구현 --------------------------------------------
+
+	@PostMapping("/socialLogin.do")
+	@ResponseBody
+	public String socialLogin(HttpServletRequest request, Model model, Principal p) {
+		
+		String id = request.getParameter("id");
+		String email = request.getParameter("email");
+		String nickname = request.getParameter("nickname");
+		
+		SocialDTO dto = new SocialDTO();
+		
+		dto.setEmail(email);
+		dto.setNickname(nickname);
+		
+		int result = 0;
+		
+		result = service.searchUser(dto);
+		
+		if(result == 1) {
+			String id2 = service.getId(dto);
+			
+			// 세션 객체 가져오기 (없으면 새로 생성)
+            HttpSession session = request.getSession(true);
+
+            // 세션에 사용자 아이디 저장
+            session.setAttribute("userId", id2);
+			
+			return "success";
+		}else {
+			return "failed";
+		}
+		
+		
+		
+	}
+
+
 }
 
 

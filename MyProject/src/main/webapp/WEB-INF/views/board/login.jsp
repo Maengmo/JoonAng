@@ -87,6 +87,11 @@
                             회원이 아니신가요? <a href="/project/signup.do" class="login">회원가입</a>
                         </p>
                     </div>
+                    <div>
+                    	<a href="javascript:kakaoLogin()">
+                    		<img src="resources/img/kakaoLogin.png" alt="카카오 로그인" class="social">
+                    	</a>
+                    </div>
                     <!-- 추가된 부분: Alert 메시지 -->
                     <!-- 
 				    <div id="alert" class="alert alert-success alert-dismissible fade show mt-3" role="alert" style="display:none;">
@@ -100,7 +105,9 @@
     </section>
 
     <%@ include file="/WEB-INF/views/inc/footer.jsp" %>
-	
+    
+    <script type="text/javascript" src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+	<script type="text/javascript" src="https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js" charset="utf-8"></script>
 	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -162,8 +169,58 @@ function showSweetAlert2(title, text, icon) {
 
 Login();
 </script>
+<!-- 카카오 로그인 -->
 
-    
+<script>
+//카카오 로그인
+Kakao.init('f33e29bc7b6f07f18871e88c4e891026');
+function kakaoLogin() {
+    Kakao.Auth.login({
+        success: function (response) {
+            Kakao.API.request({
+                url: '/v2/user/me',
+                success: function (response) {
+                	
+                	//정보 받아오기
+                	var data = {           			
+               			id : response.id,
+                       	email : response.kakao_account.email,
+       		            nickname : response.kakao_account.profile.nickname,
+       		            profile_image : response.kakao_account.profile.thumbnail_image_url,
+                	};
+                	
+                	$.ajax({
+                		type : 'POST',
+                		url : '/project/socialLogin.do',
+                		data : data,
+                		success : data => {
+                			
+                			if (data == "success") {
+                				showSweetAlert('로그인 성공', '다양한 서비스를 즐겨보세요!!😊', 'success');
+                				
+                			} else if (data == "failed") {
+                				showSweetAlert2('로그인 실패', '회원 정보가 존재하지 않습니다..😢', 'warning');
+                			}
+                			
+                		},
+                		error : (a,b,c) => console.log(a,b,c)	
+                	})
+                	
+              
+
+                    
+                },
+                fail: function (error) {
+                    alert(JSON.stringify(error));
+                },
+            })
+        },
+        fail: function (error) {
+            alert(JSON.stringify(error));
+        },
+    })
+}
+</script>    
 
 
 </body>

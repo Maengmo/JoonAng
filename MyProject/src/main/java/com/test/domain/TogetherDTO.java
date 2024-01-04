@@ -12,6 +12,6 @@ public class TogetherDTO {
 	private String work_num;
 	private String work_place;
 	private String dep_num;
-	private String work_adderss;
+	private String work_address;
 	
 }

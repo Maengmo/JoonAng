@@ -80,6 +80,20 @@
     .bold {
     	font-weight: bold;
     }
+    
+    .box {
+    	display:flex;
+    }
+    
+    .like {
+    	transition: transform 0.3s;
+	}
+	
+	.like:hover {
+		cursor:pointer;
+	    transform: scale(1.4);
+	}
+	
 </style>
 </head>
 <body>
@@ -132,7 +146,7 @@
 			            <p class="card-text">${dto.talk_content}</p>
 			            <!-- 클릭 이벤트 핸들러 추가 -->
 			            <div style="display:flex; justify-content: space-between;">
-			            	<a class="btn btn-primary" onclick="showDetails('${dto.talk_subject}', '${dto.talk_content}', '${dto.cus_id}', '${dto.dep_name}', '${dto.talk_num}')">자세히 보기</a>
+			            	<a class="btn btn-primary" onclick="showDetails('${dto.talk_subject}', '${dto.talk_content}', '${dto.cus_id}', '${dto.dep_name}', '${dto.talk_num}', '${dto.talk_like}')">자세히 보기</a>
 			            	<div style="display:flex;">
 			            		<img id="profile" class="profile" src="resources/img/로고.png">
 			            		<p class="card-text mt-3 bold" style="display:flex; flex-direction: row-reverse;">${dto.cus_name}(${dto.cus_id})</p>
@@ -176,7 +190,7 @@
 var nownum;
 
 //자세히보기 -> showDetails -> 소통 공간
-function showDetails(subject, content, customerId, depname, talknum) {
+function showDetails(subject, content, customerId, depname, talknum, talklike) {
     // 콘솔에 로그 출력
     //console.log("showDetails 함수 호출");
 
@@ -191,6 +205,7 @@ function showDetails(subject, content, customerId, depname, talknum) {
     modalContent.innerHTML = "<p><strong>내용 :</strong> " + content + "</p>" +
         "<p><strong>회사 :</strong> " + depname + "</p>" +
         "<p><strong>작성자 :</strong> " + customerId + "</p>" +
+        '<p id="count"><div class="box"><div id="like" class="like">❤️</div> ' + talklike + '</p></div>' +
         "<hr>" +
         '<h5 class="mb-3 text-center fw-bold">😄열려있는 소통의 창구😄</h5>' +
         '<div id="dynamicContent"></div>' +
@@ -236,6 +251,33 @@ function showDetails(subject, content, customerId, depname, talknum) {
 
     // 모달 열기
     $("#myModal").modal('show');
+    
+    document.getElementById("like").addEventListener('click', function(){
+    	
+    	 var count = document.getElementById("count").innerHTML;
+    	 console.log("클릭됨");
+    	 console.log(talklike);
+    	
+    	 $.ajax({
+    	        url: '/project/talk/like',
+    	        method: 'GET',
+    	        data: {
+    	            talkNum : nownum,
+    	            likeNum : talklike
+    	        },
+    	        success: function(data) {
+    	            closeDetails();
+    	            showDetails(subject, content, customerId, depname, talknum, data);
+    	        	
+    	            console.log("성공");
+    	        	
+    	        },
+    	        error: function() {
+    	            console.error('Failed to fetch additional data from the server.');
+    	        }
+    	    });
+    	
+    });
 }
 
 //모달 닫기
@@ -266,7 +308,7 @@ $(document).on('click', '#addAnswer', function () {
         success: function (data) {
             // 댓글 성공 -> 갱신
             console.log('댓글 추가 성공:', data);
-            location.reload();
+            //location.reload();
 
             // 동적으로 콘텐츠 생성
             var dynamicContent = document.getElementById("dynamicContent");
@@ -276,17 +318,20 @@ $(document).on('click', '#addAnswer', function () {
                 '<p class="mt-2">' + reviewContent + '</p>' +
                 '</div>' +
                 '<div class="col-md-3 text-end">' +
-                '<p class="mt-2">' + userId + '</p>' +
+                '<p class="mt-2">' + data + '</p>' +
                 '</div>' +
                 '</div>' +
                 '</div>';
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.error('댓글 추가 실패:', textStatus, errorThrown);
-            location.reload();
+            //location.reload();
         }
     });
 });
+
+
+
 //부서 SELECT Box 처리 
 $(document).ready(function () {
 	
@@ -347,36 +392,49 @@ function performSearch() {
     var searchInputValue = document.getElementById("searchInput").value;
 
     // 검색어+URL
-    var searchUrl = "/project/talk/text?search=" + encodeURIComponent(searchInputValue);
+    var searchUrl = "/project/talk/text" + searchInputValue;
+    
+    console.log(searchUrl);
 
-    // 페이지 이동
-    window.location.href = searchUrl;
-    
- 	// 1. 기존의 카드들 지우기
+    // 1. 기존의 카드들 지우기
     $(".board-container").empty();
-    
-    // 2. 띄워주기
-    <c:forEach var="dto" items="${searchList}">
-    console.log(dto.talk_subject);
-        var newCard = '<div class="card">' +
-                        '<div class="card-body">' +
-                            '<div style="display:flex; justify-content: space-between;">' +
-                                '<h5 class="card-title">' + dto.talk_subject + '</h5>' +
-                                '<p class="card-text text-danger">' + dto.dep_name + '</p>' +
-                            '</div>' +
-                            '<p class="card-text">' + dto.talk_content + '</p>' +
-                            '<div style="display:flex; justify-content: space-between;">' +
-                                '<a class="btn btn-primary" onclick="showDetails(\'' + dto.talk_subject + '\', \'' + dto.talk_content + '\', \'' + dto.cus_id + '\', \'' + dto.dep_name + '\', \'' + dto.talk_num + '\')">자세히 보기</a>' +
-                                '<p class="card-text mt-3" style="display:flex; flex-direction: row-reverse;">' + dto.cus_id + '</p>' +
-                            '</div>' +
-                        '</div>' +
+
+    // 2. Ajax로 검색 결과 가져오기
+    $.ajax({
+        url: searchUrl,
+        type: "GET",
+        data: JSON.stringify(),
+        dataType: "json",
+        success: function(searchList) {
+            // 3. 띄워주기
+            $.each(searchList, function(index, dto) {
+                console.log(dto.talk_subject);
+                var newCard = '<div class="card">' +
+                    '<div class="card-body">' +
+                    '<div style="display:flex; justify-content: space-between;">' +
+                    '<h5 class="card-title">' + dto.talk_subject + '</h5>' +
+                    '<p class="card-text text-danger">' + dto.dep_name + '</p>' +
+                    '</div>' +
+                    '<p class="card-text">' + dto.talk_content + '</p>' +
+                    '<div style="display:flex; justify-content: space-between;">' +
+                    '<a class="btn btn-primary" onclick="showDetails(\'' + dto.talk_subject + '\', \'' + dto.talk_content + '\', \'' + dto.cus_id + '\', \'' + dto.dep_name + '\', \'' + dto.talk_num + '\')">자세히 보기</a>' +
+                    '<p class="card-text mt-3" style="display:flex; flex-direction: row-reverse;">' + dto.cus_id + '</p>' +
+                    '</div>' +
+                    '</div>' +
                     '</div>';
 
-        // 새로운 카드를 보드 컨테이너에 추가
-        $(".board-container").append(newCard);
-    </c:forEach>
-    
-};
+                // 새로운 카드를 보드 컨테이너에 추가
+                $(".board-container").append(newCard);
+            });
+        },
+        error: function(error) {
+            console.error("Error fetching search results: ", error);
+            
+        }
+    });
+}
+
+
 
 
 
