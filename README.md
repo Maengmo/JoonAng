@@ -55,8 +55,7 @@
 <br>
 
 ## 📁 ERD 
-![2  ERD 설계](https://github.com/Maengmo/JoonAng/assets/117720344/67dda620-de93-4c84-bba3-8967eee0284b)
-
+![2  ERD 설계 - 최종](https://github.com/Maengmo/JoonAng/assets/117720344/43759225-42bb-4d3e-b1e8-52fbff3b250d)
 
 
 <br>
