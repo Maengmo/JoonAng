@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.test.domain.AnswerDTO;
 import com.test.domain.CustomerDTO;
+import com.test.domain.SocialDTO;
 import com.test.domain.TalkDTO;
 import com.test.domain.TanswerDTO;
 import com.test.domain.TogetherDTO;
@@ -141,5 +142,146 @@ public class BoardServiceImpl implements BoardService{
 		
 		return list;
 	}
+
+	@Override
+	public int editEmail(CustomerDTO dto) {
+		
+		int result = mapper.editEmail(dto);
+		
+		return result;
+	}
+
+	@Override
+	public int editPw(CustomerDTO dto) {
+		
+		int result = mapper.editPw(dto);
+		
+		return result;
+	}
+
+	@Override
+	public String findId(CustomerDTO dto) {
+		
+		String id = mapper.findId(dto);
+		
+		return id;
+	}
+
+	@Override
+	public String findPw(CustomerDTO dto) {
+		
+		String pw = mapper.findPw(dto);
+		
+		return pw;
+	}
+
+	@Override
+	public int addLike(String talknum) {
+		
+		int like = mapper.addLike(talknum);
+		
+		return like;
+	}
+
+	@Override
+	public void addtalk2() {
+		
+		mapper.addtalk2();
+		
+	}
+
+	@Override
+	public List<TalkDTO> getMyTalk(String id) {
+		
+		List<TalkDTO> list = mapper.getMyTalk(id);
+		
+		return list;
+	}
+
+	@Override
+	public List<TalkDTO> getTalkList3(String talk_num) {
+		
+		List<TalkDTO> list = mapper.getTalkList3(talk_num);
+		
+		return list;
+	}
+
+	@Override
+	public int editTalk(TalkDTO dto) {
+		
+		int result = mapper.editTalk(dto);
+		
+		return result;
+	}
+
+	@Override
+	public int delTalk(String talk_num) {
+		
+		int result = mapper.delTalk(talk_num);
+		
+		return result;
+	}
+
+	@Override
+	public void delTalk_like(String talk_num) {
+		
+		mapper.delTalk_like(talk_num);
+		
+	}
+
+	@Override
+	public List<TogetherDTO> getMyTogether(String userId) {
+		
+		List<TogetherDTO> list = mapper.getMyTogether(userId);
+		
+		return list;
+	}
+
+	@Override
+	public int editTogether(TogetherDTO dto) {
+		
+		int result = mapper.editTogether(dto);
+		
+		return result;
+	}
+
+	@Override
+	public int delTogether(String to_num) {
+		
+		int result = mapper.delTogether(to_num);
+		
+		return result;
+	}
+
+	@Override
+	public int searchUser(SocialDTO dto) {
+		
+		int result = mapper.searchUser(dto);
+		
+		return result;
+	}
 	
+	@Override
+	public String getId(SocialDTO dto) {
+		
+		String id = mapper.getId(dto);
+		
+		return id;
+		
+	}
+
+	@Override
+	public void addState(String id) {
+		
+		mapper.addState(id);
+		
+	}
+
+	@Override
+	public String getState(String username) {
+		
+		String state = mapper.getState(username);
+		
+		return state;
+	}
 }

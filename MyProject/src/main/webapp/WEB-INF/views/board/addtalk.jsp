@@ -34,6 +34,7 @@
                         <textarea class="form-control" id="formContent" rows="3" name="talk_content" required placeholder="내용을 입력하세요"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">제출</button>
+                	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }">
                 </form>
             </div>
         </div>

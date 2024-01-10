@@ -5,13 +5,16 @@
 <%
 	//현재 요청에 대한 세션 가져오기 (세션이 없으면 null 반환)
 	HttpSession session2 = request.getSession(false);
+	HttpSession session3 = request.getSession(false);
 	// 세션에 저장된 사용자 아이디 가져오기
 	String userId = (String) session2.getAttribute("userId");
+	String adminId = (String) session3.getAttribute("adminId");
+	
 %>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-
+	
 	@font-face {
 	     font-family: 'S-CoreDream-3Light';
 	     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
@@ -91,10 +94,27 @@
 	                    <a class="nav-link nav-link-custom white" href="/project/together.do">함께해요</a>
 	                </li>
                 <% } else { %>
-                    <%-- 세션에 userId가 없을 경우(로그아웃 상태) --%>
+                	<% if(session.getAttribute("adminId") != null) {%>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom white" href="/project/admin.do">관리자 페이지</a>
+                    </li>
+                     <li class="nav-item">
+	                    <a class="nav-link nav-link-custom white" href="/project/talk.do">와글와글</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link nav-link-custom white" href="/project/together.do">함께해요</a>
+	                </li>
+                    <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom white" href="/project/adminLogin.do">관리자</a>
+                    </li> 
+                    <% } %>
                     <li class="nav-item">
                         <a class="nav-link nav-link-custom white" href="/project/login.do">로그인</a>
                     </li>
+                    <li class="nav-item">
+	                	<a class="nav-link nav-link-custom white" href="/project/find.do">ID,PW 찾기</a>
+	                </li>
                     <li class="nav-item">
                         <a class="nav-link nav-link-custom white" href="/project/signup.do">회원가입</a>
                     </li>

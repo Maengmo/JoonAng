@@ -5,12 +5,64 @@
    xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
    
+   <!-- 유저 정보 객체 -->
+   <bean id="customUserDetailsService" class="com.test.security.CustomUserDetailsService"></bean>
+   
    <!-- 403 처리 담당자 -->
    <bean id="customAccessDenied" class="com.test.security.CustomAccessDeniedHandler"></bean>
    
-  
+   <!-- 암호화객체(사용자 정의) -->
+   <bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
    
+   <!-- 로그인 성공 처리 담당자 -->
+   <bean id="customLoginSuccess" class="com.test.security.CustomLoginSuccessHandler"></bean>
+  
+   <!-- 로그인 실패 처리 담당자 -->
+   <bean id="customLoginFailure" class="com.test.security.CustomLoginFailHandler"></bean>
+	
+	<!--
+	<security:jdbc-user-service data-source-ref="dataSource"/>
+	
+	<security:authentication-manager>
+      <security:authentication-provider user-service-ref="customUserDetailsService">
+         <security:password-encoder ref="bcryptPasswordEncoder"/>
+      </security:authentication-provider>
+   </security:authentication-manager>
+    
+    <security:http>
+	
+	-->
+	
+    <!-- 사용자 로그인 설정 
+    <security:form-login 
+        login-page="/login.do"
+        login-processing-url="/login.do"
+        username-parameter="username" 
+        password-parameter="password"
+        authentication-success-handler-ref="customLoginSuccess" 
+        authentication-failure-handler-ref="customLoginFailure"/>
+	-->
+    <!-- 관리자 로그인 설정 
+    <security:form-login 
+        login-page="/adminLogin.do"
+        login-processing-url="/adminLogin.do"
+        username-parameter="username" 
+        password-parameter="password"
+        authentication-success-handler-ref="customLoginSuccess" 
+        authentication-failure-handler-ref="customLoginFailure"/>
 
+    <security:logout logout-url="/logout.do" invalidate-session="true" logout-success-url="/board.do"/>
+    <security:access-denied-handler ref="customAccessDenied"/>
+	</security:http>
+	-->
+   <!-- <security:intercept-url pattern="/*" access="permitAll"/>-->
+      <!--      <security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MEMBER')"/>-->
+      <!--  <security:intercept-url pattern="/signup.do" access="hasRole('ROLE_ADMIN')"/> -->
+      <!--<security:intercept-url pattern="/board.do" access="hasRole('ROLE_ADMIN')"/>-->
+      <!--<security:form-login/>-->
+  <!-- 
+  <security:global-method-security pre-post-annotations="enabled" secured-annotations="enabled"/>
+	 -->
 </beans>
 
 

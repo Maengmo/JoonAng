@@ -25,6 +25,14 @@
 body {
 	background-color: #F6F1ED !important;
 }
+
+.col-md-6 {
+	width : 800px !important;
+    background-color: #3498db;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3),
+                -10px -10px 20px rgba(255, 255, 255, 0.3);
+    /* 다른 스타일링 속성 추가 가능 */
+}
 </style>
 </head>
 <body>
@@ -94,6 +102,7 @@ body {
 		    </div>
 		     -->
 		            <button id="submitbtn" type="submit" class="btn btn-primary w-100 mb-1 mt-1">가입하기</button>
+		        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }">
 		        </form>
 		    </div>
 		</div>	

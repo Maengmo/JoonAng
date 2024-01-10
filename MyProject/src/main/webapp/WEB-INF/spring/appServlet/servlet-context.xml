@@ -10,8 +10,8 @@
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
 	<!-- Enables the Spring MVC @Controller programming model -->
-	<annotation-driven />
-
+	<!-- <annotation-driven /> -->
+	
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/" />
 
@@ -23,5 +23,44 @@
 	
 	<context:component-scan base-package="com.test.*" />
 
+	<interceptors>
+		<interceptor>
+			<mapping path="/*"/>
+			<exclude-mapping path = "/"></exclude-mapping>
+			<exclude-mapping path = "/board.do"></exclude-mapping>
+			<exclude-mapping path = "/login.do"></exclude-mapping>
+			<exclude-mapping path = "/find.do"></exclude-mapping>
+			<exclude-mapping path = "/signup.do"></exclude-mapping>
+			<exclude-mapping path = "/adminLogin.do"></exclude-mapping>
+			<exclude-mapping path = "/adminLogout.do"></exclude-mapping>
+			<exclude-mapping path = "/adminMyPage.do"></exclude-mapping>
+			<exclude-mapping path = "/adminUser.do"></exclude-mapping>
+			<exclude-mapping path = "/adminTalk.do"></exclude-mapping>
+			<exclude-mapping path = "/adminTogether.do"></exclude-mapping>
+			<exclude-mapping path = "/admin.do"></exclude-mapping>
+			<beans:bean class="com.test.project.SessionInterceptor"></beans:bean>
+		</interceptor>
+	</interceptors>
+	
+	<interceptors>
+		<interceptor>
+			<mapping path="/*"/>
+			<exclude-mapping path = "/"></exclude-mapping>
+			<exclude-mapping path = "/board.do"></exclude-mapping>
+			<exclude-mapping path = "/login.do"></exclude-mapping>
+			<exclude-mapping path = "/logout.do"></exclude-mapping>
+			<exclude-mapping path = "/find.do"></exclude-mapping>
+			<exclude-mapping path = "/signup.do"></exclude-mapping>
+			<exclude-mapping path = "/talk.do"></exclude-mapping>
+			<exclude-mapping path = "/addtalk.do"></exclude-mapping>
+			<exclude-mapping path = "/mypage.do"></exclude-mapping>
+			<exclude-mapping path = "/mypage_talk.do"></exclude-mapping>
+			<exclude-mapping path = "/mypage_talkEdit.do"></exclude-mapping>
+			<exclude-mapping path = "/mypage_together.do"></exclude-mapping>
+			<exclude-mapping path = "/together.do"></exclude-mapping>			
+			<exclude-mapping path = "/adminLogin.do"></exclude-mapping>
+			<beans:bean class="com.test.project.SessionInterceptorAdmin"></beans:bean>
+		</interceptor>
+	</interceptors>
 	
 </beans:beans>

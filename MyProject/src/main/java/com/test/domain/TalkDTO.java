@@ -15,6 +15,7 @@ public class TalkDTO {
 	private String cus_birth;
 	private String cus_email;
 	private String cus_pw;
+	private String talk_like;
 
 }
 

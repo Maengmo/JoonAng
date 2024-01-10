@@ -8,6 +8,8 @@
 		on t.cus_id = c.cus_id
 		inner join tblDepartment d
 		on c.dep_num = d.dep_num
+		inner join tblTalk_like l
+		on t.talk_num = l.talk_num
 		order by t.talk_num desc
 	</select>
 	
@@ -59,6 +61,8 @@
 		on t.cus_id = c.cus_id
 		inner join tblDepartment d
 		on c.dep_num = d.dep_num
+		inner join tbltalk_like l
+		on t.talk_num = l.talk_num
 		where d.dep_num = #{dep_num}
 	</select>
 	
@@ -76,7 +80,13 @@
 	
 	<select id="searchList" resultType="com.test.domain.TalkDTO">
 	    <![CDATA[
-	    SELECT * FROM tblTalk 
+	    select * from tblTalk t
+		inner join tblCustomer c
+		on c.cus_id = t.cus_id
+		inner join tblDepartment d
+		on c.dep_num = d.dep_num
+		inner join tblTalk_like l
+		on l.talk_num = t.talk_num
 	    WHERE talk_subject LIKE '%' || #{name} || '%' OR talk_content LIKE '%' || #{name} || '%'
 	    ]]>
 	</select>
@@ -90,6 +100,135 @@
 		inner join tblDepartment d
 		on c.dep_num = d.dep_num
 		where cus_id = #{id}
+	</select>
+	
+    <update id="editEmail" parameterType="com.test.domain.CustomerDTO">
+        UPDATE TblCustomer
+        SET cus_email = #{cus_email}
+        WHERE cus_id = #{cus_id}
+    </update>
+    
+    <update id="editPw" parameterType="com.test.domain.CustomerDTO">
+        UPDATE TblCustomer
+        SET cus_pw = #{cus_pw}
+        WHERE cus_id = #{cus_id}
+    </update>
+    
+    <select id="findId" resultType="String" parameterType="com.test.domain.CustomerDTO">
+    	select cus_id
+    	from tblCustomer
+    	where cus_email = #{cus_email} and dep_num = #{dep_num}
+    </select>
+    
+    <select id="findPw" resultType="String" parameterType="com.test.domain.CustomerDTO">
+    	select cus_pw
+    	from tblCustomer
+    	where cus_email = #{cus_email} and dep_num = #{dep_num} and cus_id = #{cus_id}
+    </select>
+    
+    <update id="addLike">
+    	update tblTalk_like
+    	set talk_like = talk_like + 1
+    	where talk_num = #{talkNum}
+    </update>
+    
+    <insert id="addtalk2">
+		insert into tblTalk_like
+		values ((select max(talk_num) from tbltalk), 0)
+	</insert> 
+	
+	<select id="checkMember" resultType="Integer">
+		select count(*) from tblCustomer where cus_id = #{id}
+	</select>
+	
+	<select id="readMember" resultType="com.test.domain.CustomerDTO">
+		select * from tblCustomer where cus_id = #{id}
+	</select>
+	
+	<select id="getMyTalk" resultType="com.test.domain.TalkDTO">
+		select * from tblTalk t
+		inner join tblCustomer c
+		on t.cus_id = c.cus_id
+		inner join tblDepartment d
+		on c.dep_num = d.dep_num
+		inner join tblTalk_like l
+		on t.talk_num = l.talk_num
+		where c.cus_id = #{id}
+		order by t.talk_num desc
+	</select>
+	
+	<select id="getTalkList3" resultType="com.test.domain.TalkDTO">
+		select * from tblTalk
+		where talk_num = #{talk_num}
+	</select>
+	
+	<update id="editTalk" parameterType="com.test.domain.TalkDTO">
+		UPDATE tblTalk 
+		SET 
+		    talk_subject = #{talk_subject}, 
+		    talk_content = #{talk_content} 
+		WHERE 
+		    talk_num = #{talk_num}
+	</update>
+	
+	<delete id="delTalk">
+		Delete from tblTalk
+		where talk_num = #{talk_num}
+	</delete>
+	
+	<delete id="delTalk_like">
+		Delete from tblTalk_like
+		where talk_num = #{talk_num}
+	</delete>
+	
+	<select id="getMyTogether" resultType="com.test.domain.TogetherDTO">
+		select * from tblTogether t
+		inner join tblStation s
+		on t.sta_num = s.sta_num
+		inner join tblWork w
+		on w.sta_num = s.sta_num
+		where t.cus_id = #{userId}
+	</select>
+	
+	<update id="editTogether" parameterType="com.test.domain.TogetherDTO">
+		UPDATE tblTogether
+		SET 
+		    to_content = #{to_content} 
+		WHERE 
+		    to_num = #{to_num}
+	</update>
+	
+	<delete id="delTogether">
+		Delete from tblTogether
+		where to_num = #{to_num}
+	</delete>
+	
+	<select id="searchUser" parameterType="com.test.domain.SocialDTO" resultType="Integer">
+		select count(*) from tblCustomer
+		where cus_email = #{email} and cus_name = #{nickname}
+	</select>
+	
+	<select id="getId" parameterType="com.test.domain.SocialDTO" resultType="String">
+		select cus_id from tblCustomer
+		where cus_email = #{email} and cus_name = #{nickname}
+	</select>
+	
+	<insert id="addState">
+		insert into tblState
+		values (#{id}, 1)
+	</insert> 
+	
+	<select id="getState" resultType="String">
+		select cus_state from tblState
+		where cus_id = #{username}
+	</select>
+	
+	<select id="checkAdmin" resultType="Integer">
+		select count(*) from tblAdmin where ad_id = #{id}
+	</select>
+	
+	<select id="readAdmin" resultType="com.test.domain.AdminDTO">
+		select * from tblAdmin where ad_id = #{id}
 	</select>
 
 </mapper>

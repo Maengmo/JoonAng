@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.mapper.AdminMapper">
+
+<select id="getPwd" resultType="String">
+	select ad_pw from tblAdmin
+	where ad_id = #{adminName}
+</select>
+
+<select id="TalkList" resultType="com.test.domain.TalkDTO">
+	select * from tblTalk t
+	inner join tblCustomer c
+	on t.cus_id = c.cus_id
+	inner join tblDepartment d
+	on c.dep_num = d.dep_num
+	inner join tblTalk_like l
+	on t.talk_num = l.talk_num
+	order by t.talk_num desc
+</select>
+
+<select id="RecentTalk" resultType="com.test.domain.TalkDTO">
+	<![CDATA[
+    SELECT * 
+	FROM (
+	    SELECT * 
+	    FROM tblTalk
+	    ORDER BY talk_num DESC
+	) t
+	inner join tblCustomer c
+	on t.cus_id = c.cus_id
+	inner join tblDepartment d
+	on c.dep_num = d.dep_num
+	WHERE ROWNUM <= 5
+	]]>
+</select>
+
+<select id="BestTalk" resultType="com.test.domain.TalkDTO">
+	<![CDATA[
+		select * from tblTalk t
+		inner join tblCustomer c
+		on c.cus_id = t.cus_id
+		inner join tblDepartment d
+		on c.dep_num = d.dep_num
+		where talk_num in (
+		    select talk_num
+		    from (
+		        SELECT t.talk_num, COUNT(a.talk_num) AS num_answers
+		        FROM tblTalk t
+		        INNER JOIN tblAnswer a ON t.talk_num = a.talk_num
+		        GROUP BY t.talk_num
+		        ORDER BY num_answers DESC
+		    )
+		    WHERE ROWNUM <= 5
+		)
+	]]>
+</select>
+
+<select id="getAdmin" resultType="com.test.domain.AdminDTO">
+	select * from tblAdmin
+	where ad_id = #{id}
+</select>
+
+<select id="UserList" resultType="com.test.domain.CustomerDTO">
+	select * from tblCustomer c
+	inner join tblDepartment d
+	on d.dep_num = c.dep_num
+	order by c.dep_num, cus_name
+</select>
+
+<select id="adminUserDetail" resultType="com.test.domain.CustomerDTO">
+	select * from tblCustomer c
+	inner join tblDepartment d
+	on d.dep_num = c.dep_num
+	inner join tblState s
+	on c.cus_id = s.cus_id
+	where c.cus_id = #{id}
+</select>
+
+<update id="stopUser" parameterType="String">
+	update tblState set cus_state = 0 where cus_id = #{id}
+</update>
+
+<update id="comebackUser" parameterType="String">
+	update tblState set cus_state = 1 where cus_id = #{id}
+</update>
+
+<delete id="delUser">
+	delete from tblCustomer where cus_id = #{id}
+</delete>
+
+<delete id="delState">
+	delete from tblState where cus_id = #{id}
+</delete>
+
+<select id="getUserList" resultType="com.test.domain.CustomerDTO">
+	select * from tblCustomer c
+	inner join tblDepartment d
+	on c.dep_num = d.dep_num
+	where d.dep_num = #{depnum}
+	order by c.dep_num, cus_name
+</select>
+
+<select id="searchList" resultType="com.test.domain.CustomerDTO">
+	<![CDATA[
+	select * from tblCustomer c
+	inner join tblDepartment d
+	on c.dep_num = d.dep_num
+	where cus_name like '%' || #{search} || '%'
+	order by c.dep_num, cus_name
+	]]>
+</select>
+
+<select id="stopList" resultType="com.test.domain.CustomerDTO">
+	select * from tblCustomer c
+	inner join tblState s
+	on c.cus_id = s.cus_id
+	inner join tblDepartment d
+	on c.dep_num = d.dep_num
+	where s.cus_state = 0
+</select>
+
+<select id="activeList" resultType="com.test.domain.CustomerDTO">
+	select * from tblCustomer c
+	inner join tblState s
+	on c.cus_id = s.cus_id
+	inner join tblDepartment d
+	on c.dep_num = d.dep_num
+	where s.cus_state = 1
+</select>
+
+<delete id="delTalk">
+	delete from tblTalk
+	where talk_num = #{talk_num}
+</delete>
+
+<delete id="delTalk_like">
+	delete from tblTalk_like
+	where talk_num = #{talk_num}
+</delete>
+
+<delete id="delAnswer">
+	delete from tblAnswer
+	where ans_num = #{ans_num}
+</delete>
+
+<select id="answerList" resultType="com.test.domain.AnswerDTO">
+	select * from tblAnswer
+	where talk_num = #{talk_num}
+</select>
+
+<select id="popularTalk" resultType="com.test.domain.TalkDTO">
+	<![CDATA[
+		WITH TalkWithAnswerCount AS (
+		    SELECT t.talk_num, COUNT(a.talk_num) AS num_answers
+		    FROM tblTalk t
+		    INNER JOIN tblAnswer a ON t.talk_num = a.talk_num
+		    GROUP BY t.talk_num
+		)
+		
+		SELECT *
+		FROM tblTalk t
+		INNER JOIN tblCustomer c ON c.cus_id = t.cus_id
+		INNER JOIN tblDepartment d ON c.dep_num = d.dep_num
+		INNER JOIN tblTalk_like l ON t.talk_num = l.talk_num
+		ORDER BY (
+		    SELECT num_answers
+		    FROM TalkWithAnswerCount
+		    WHERE t.talk_num = TalkWithAnswerCount.talk_num
+		) DESC
+	]]>
+</select>
+
+<select id="togetherList" resultType="com.test.domain.TogetherDTO">
+	select * from tblTogether t
+	inner join tblWork w 
+	on t.sta_num = w.sta_num
+	inner join tblStation s
+	on s.sta_num = w.sta_num
+	inner join tblDepartment d
+	on w.dep_num = d.dep_num
+</select>
+
+<select id="workList" resultType="com.test.domain.WorkDTO">
+	select * from tblWork w
+	inner join tblDepartment d
+	on w.dep_num = d.dep_num
+	inner join tblStation s
+	on s.sta_num = w.sta_num
+</select>
+
+<select id="getDetail" resultType="com.test.domain.TogetherDTO">
+	select * from tblTogether t
+	inner join tblCustomer c
+	on t.cus_id = c.cus_id
+	inner join tblDepartment d
+	on d.dep_num = c.dep_num
+	where sta_num = #{sta_num}
+	order by t.to_num desc
+</select>
+
+<select id="getDepList" resultType="com.test.domain.WorkDTO">
+	select * from tblWork w
+	inner join tblDepartment d
+	on w.dep_num = d.dep_num
+	inner join tblStation s
+	on s.sta_num = w.sta_num
+	where d.dep_num = #{dep_num}
+</select>
+
+<select id="getSearchList" resultType="com.test.domain.WorkDTO">
+	<![CDATA[
+	select * from tblWork w
+	inner join tblDepartment d
+	on w.dep_num = d.dep_num
+	inner join tblStation s
+	on s.sta_num = w.sta_num
+    where w.work_place like '%' || #{sValue} || '%' 
+    or w.work_address like '%' || #{sValue} || '%'
+    order by w.work_num
+	]]>
+</select>
+
+<delete id="delTogether">
+	delete from tblTogether
+	where to_num = #{to_num}
+</delete>
+
+<select id="popularTogether" resultType="com.test.domain.WorkDTO">
+	select * from tblWork w
+	inner join popular_together p
+	on w.sta_num = p.sta_num
+	inner join tblDepartment d
+	on d.dep_num = w.dep_num
+	inner join tblStation s
+	on s.sta_num = w.sta_num
+	order by 댓글 desc
+</select>
+
+<select id="latestTogether" resultType="com.test.domain.WorkDTO">
+	select * from tblWork w
+	inner join tblDepartment d
+	on w.dep_num = d.dep_num
+	inner join tblStation s
+	on s.sta_num = w.sta_num
+	inner join tblTogether t
+	on w.sta_num = t.sta_num
+	order by to_num desc
+</select>
+
+
+
+</mapper>

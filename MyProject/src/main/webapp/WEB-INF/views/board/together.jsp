@@ -33,7 +33,7 @@
 	    </select>
 	  </div>
 
-    <div id="map" style="width:100%;height:550px;"></div>
+    <div id="map" style="width:100%;height:750px;"></div>
     
     <%@ include file="/WEB-INF/views/inc/footer.jsp" %>
 	
@@ -110,6 +110,7 @@
             '   </div>',
             '   <hr class="my-4">',
             '   <h5 class="mb-3 text-center fw-bold">😄열려있는 소통의 창구😄</h5>',
+            '<div id="dynamicContent"> ',
             <c:forEach items="${list2}" var="dto2">
             '<c:if test="${dto.sta_num eq dto2.sta_num}">',
             <c:set var="tonum" value="${dto2.to_num}" />
@@ -125,6 +126,7 @@
             '   </div>',
           	'</c:if>',
             </c:forEach>
+          	'</div>',
             '   <div class="mb-3 mt-3">',
             '       <form>',
             '           <div class="mb-3 mt-1">',
@@ -134,6 +136,7 @@
             '               <button type="button" class="btn btn-primary" onclick="addTanswer(${dto.sta_num})">작성 완료</button>',
             '               <button type="button" class="btn btn-danger" onclick="closeInfoWindow(${dto.sta_num})">닫기</button>',    
             '           </div>',
+            '<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }">',
             '       </form>',
             '   </div>',
             '</div>'
@@ -199,19 +202,26 @@ function addTanswer(sta_num) {
         },
         success: function (data) {
             console.log('답변 추가 성공:', data);
-            location.reload();
-
-            if (data.success) {
-                console.log('답변 추가 성공');
-            } else {
-                console.error('답변 추가 실패:', data.message);
-            }
+            //location.reload();
+            
+            var dynamicContent = document.getElementById("dynamicContent");
+            dynamicContent.innerHTML += '<div class="container border mb-0 mt-0">' +
+                '<div class="row">' +
+                '<div class="col-md-9">' +
+                '<p class="mt-2">' + reviewContent + '</p>' +
+                '</div>' +
+                '<div class="col-md-3 text-end">' +
+                '<p class="mt-2">' + data + '</p>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+                
         },
         error: function (xhr, status, error, data) {
             console.error('답변 추가 실패:', status, error);
             console.log(data);
             
-            location.reload();
+            //location.reload();
         }
     });
 }
@@ -331,6 +341,7 @@ function addMarker(data) {
             '               <button type="button" class="btn btn-primary" onclick="addTanswer(${dto.sta_num})">작성 완료</button>',
             '               <button type="button" class="btn btn-danger" onclick="closeInfoWindow(${dto.sta_num})">닫기</button>',    
             '           </div>',
+            '<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }">',
             '       </form>',
             '   </div>',
             '</div>'

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.test.domain.AnswerDTO;
 import com.test.domain.CustomerDTO;
+import com.test.domain.SocialDTO;
 import com.test.domain.TalkDTO;
 import com.test.domain.TanswerDTO;
 import com.test.domain.TogetherDTO;
@@ -41,5 +42,43 @@ public interface BoardService {
 	int checkid(String id);
 
 	List<CustomerDTO> getMyList(String id);
+
+	int editEmail(CustomerDTO dto);
+
+	int editPw(CustomerDTO dto);
+
+	String findId(CustomerDTO dto);
+
+	String findPw(CustomerDTO dto);
+
+	int addLike(String talkNum);
+
+	void addtalk2();
+
+	List<TalkDTO> getMyTalk(String id);
+
+	List<TalkDTO> getTalkList3(String talk_num);
+
+	int editTalk(TalkDTO dto);
+
+	int delTalk(String talk_num);
+
+	void delTalk_like(String talk_num);
+
+	List<TogetherDTO> getMyTogether(String userId);
+
+	int editTogether(TogetherDTO dto);
+
+	int delTogether(String to_num);
+
+	int searchUser(SocialDTO dto);
+
+	String getId(SocialDTO dto);
+
+	void addState(String id);
+
+	String getState(String username);
+
+	
 
 }

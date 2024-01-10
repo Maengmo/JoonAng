@@ -12,5 +12,7 @@ public class CustomerDTO {
 	private String cus_email;
 	private String cus_pw;
 	private String dep_name;
+	private String cus_state;
+	private String cus_state_name;
 
 }

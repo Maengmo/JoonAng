@@ -9,6 +9,7 @@ public class WorkDTO {
 	private String sta_num;
 	private String work_place;
 	private String dep_num;
+	private String dep_name;
 	private String sta_l;
 	private String sta_h;
 	private String work_address;
