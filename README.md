@@ -2,7 +2,7 @@
 ### 중앙 그룹 내의 직원들끼리 소통과 만남을 추구하여 친목을 도모할 수 있는 플랫폼 
 <br>    
 <img width="954" alt="로그인" src="https://github.com/Maengmo/JoonAng/assets/117720344/617709a1-4b7f-479c-af21-470327d20b6e">
-
+ 
 <br>    
  
 ## ⁉ 프로그램 소개
